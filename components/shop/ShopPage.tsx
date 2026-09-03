@@ -28,13 +28,6 @@ import {
 } from '@/components/toyverse/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
 import { shopProducts, type Product } from '@/data/products';
 import { cn } from '@/lib/utils';
 
@@ -530,43 +523,59 @@ export function ShopPage() {
       </section>
       <TrustBar className="pb-12" />
       <Footer />
-      <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-        <SheetContent
-          side="left"
-          className="w-[min(92vw,380px)] overflow-y-auto bg-white p-0"
+      {mobileFiltersOpen ? (
+        <dialog
+          open
+          className="fixed inset-0 z-50 lg:hidden"
+          aria-modal="true"
+          aria-labelledby="mobile-filter-title"
         >
-          <SheetHeader className="border-b border-[#E6EAF2] p-5">
-            <SheetTitle className="text-xl font-black text-[#101828]">
-              Filters
-            </SheetTitle>
-            <SheetDescription>
-              Refine toys by category, age, price, rating and availability.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="p-5">
-            <FilterSidebar
-              filters={filters}
-              onToggle={toggleFilter}
-              onClear={clearFilters}
-            />
-            <Button
-              type="button"
-              className="mt-4 h-11 w-full rounded-xl bg-gradient-to-r from-[#6D4AFF] to-[#247BFE] font-extrabold"
-              onClick={() => setMobileFiltersOpen(false)}
-            >
-              Show Toys
-            </Button>
-            <button
-              type="button"
-              aria-label="Close filters"
-              className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl bg-[#F2EFFF] text-[#6D4AFF]"
-              onClick={() => setMobileFiltersOpen(false)}
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-        </SheetContent>
-      </Sheet>
+          <button
+            type="button"
+            aria-label="Close filters"
+            className="absolute inset-0 bg-[#101828]/35 backdrop-blur-sm"
+            onClick={() => setMobileFiltersOpen(false)}
+          />
+          <motion.aside
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.25 }}
+            className="relative h-full w-[min(92vw,380px)] overflow-y-auto bg-white shadow-2xl"
+          >
+            <div className="border-b border-[#E6EAF2] p-5">
+              <h2 id="mobile-filter-title" className="text-xl font-black text-[#101828]">
+                Filters
+              </h2>
+              <p className="mt-1 text-sm text-[#667085]">
+                Refine toys by category, age, price, rating and availability.
+              </p>
+              <button
+                type="button"
+                aria-label="Close filters"
+                className="absolute right-4 top-4 grid size-9 place-items-center rounded-xl bg-[#F2EFFF] text-[#6D4AFF]"
+                onClick={() => setMobileFiltersOpen(false)}
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="p-5">
+              <FilterSidebar
+                filters={filters}
+                onToggle={toggleFilter}
+                onClear={clearFilters}
+              />
+              <Button
+                type="button"
+                className="mt-4 h-11 w-full rounded-xl bg-gradient-to-r from-[#6D4AFF] to-[#247BFE] font-extrabold"
+                onClick={() => setMobileFiltersOpen(false)}
+              >
+                Show Toys
+              </Button>
+            </div>
+          </motion.aside>
+        </dialog>
+      ) : null}
     </main>
   );
 }
