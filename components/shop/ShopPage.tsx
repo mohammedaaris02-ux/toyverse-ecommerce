@@ -28,7 +28,6 @@ import {
 } from '@/components/toyverse/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { shopProducts, type Product } from '@/data/products';
 import { cn } from '@/lib/utils';
 
@@ -331,12 +330,24 @@ function ShopToolbar({
             <div className="flex h-10 items-center gap-2 rounded-xl px-2.5 text-sm font-extrabold text-[#101828]">
               <PackageCheck className="size-4 text-[#6D4AFF]" />
               <span>In Stock Only</span>
-              <Switch
-                size="sm"
-                checked={inStockOnly}
-                onCheckedChange={onInStockOnlyChange}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={inStockOnly}
                 aria-label="Show in-stock products only"
-              />
+                onClick={() => onInStockOnlyChange(!inStockOnly)}
+                className={cn(
+                  'relative h-4 w-7 rounded-full transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#6D4AFF]/25',
+                  inStockOnly ? 'bg-[#6D4AFF]' : 'bg-[#D9E2F0]',
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-0.5 size-3 rounded-full bg-white shadow-sm transition',
+                    inStockOnly ? 'left-3.5' : 'left-0.5',
+                  )}
+                />
+              </button>
             </div>
             <button
               type="button"
