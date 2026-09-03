@@ -5,11 +5,11 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
+  BadgePercent,
   ChevronLeft,
   ChevronRight,
   Filter,
-  Grid2X2,
-  Grid3X3,
+  PackageCheck,
   PackageSearch,
   Search,
   SlidersHorizontal,
@@ -28,6 +28,7 @@ import {
 } from '@/components/toyverse/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { shopProducts, type Product } from '@/data/products';
 import { cn } from '@/lib/utils';
 
@@ -259,19 +260,25 @@ function ShopToolbar({
   count,
   search,
   sort,
-  layout,
+  inStockOnly,
+  onSaleOnly,
   onSearch,
   onSort,
-  onLayout,
+  onInStockOnlyChange,
+  onOnSaleOnlyChange,
+  onClearQuickFilters,
   onOpenFilters,
 }: {
   count: number;
   search: string;
   sort: SortOption;
-  layout: 'regular' | 'compact';
+  inStockOnly: boolean;
+  onSaleOnly: boolean;
   onSearch: (value: string) => void;
   onSort: (value: SortOption) => void;
-  onLayout: (value: 'regular' | 'compact') => void;
+  onInStockOnlyChange: (value: boolean) => void;
+  onOnSaleOnlyChange: () => void;
+  onClearQuickFilters: () => void;
   onOpenFilters: () => void;
 }) {
   return (
@@ -320,32 +327,36 @@ function ShopToolbar({
               <option key={option}>{option}</option>
             ))}
           </select>
-          <div className="hidden rounded-xl border border-[#D9E2F0] bg-white p-1 sm:flex">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[#E6EAF2] bg-white p-1.5 shadow-[0_8px_24px_rgb(16_24_40/4%)]">
+            <div className="flex h-10 items-center gap-2 rounded-xl px-2.5 text-sm font-extrabold text-[#101828]">
+              <PackageCheck className="size-4 text-[#6D4AFF]" />
+              <span>In Stock Only</span>
+              <Switch
+                size="sm"
+                checked={inStockOnly}
+                onCheckedChange={onInStockOnlyChange}
+                aria-label="Show in-stock products only"
+              />
+            </div>
             <button
               type="button"
-              aria-label="Regular grid view"
-              onClick={() => onLayout('regular')}
+              onClick={onOnSaleOnlyChange}
               className={cn(
-                'grid size-9 place-items-center rounded-lg transition',
-                layout === 'regular'
-                  ? 'bg-[#F2EFFF] text-[#6D4AFF]'
-                  : 'text-[#667085] hover:text-[#6D4AFF]',
+                'inline-flex h-10 items-center gap-2 rounded-xl border px-3 text-sm font-extrabold transition focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#6D4AFF]/25',
+                onSaleOnly
+                  ? 'border-transparent bg-[#6D4AFF] text-white shadow-md shadow-[#6D4AFF]/20'
+                  : 'border-[#E6EAF2] bg-[#F8FAFC] text-[#101828] hover:border-[#6D4AFF]/25 hover:text-[#6D4AFF]',
               )}
             >
-              <Grid3X3 className="size-4" />
+              <BadgePercent className="size-4" />
+              On Sale
             </button>
             <button
               type="button"
-              aria-label="Compact grid view"
-              onClick={() => onLayout('compact')}
-              className={cn(
-                'grid size-9 place-items-center rounded-lg transition',
-                layout === 'compact'
-                  ? 'bg-[#F2EFFF] text-[#6D4AFF]'
-                  : 'text-[#667085] hover:text-[#6D4AFF]',
-              )}
+              className="h-10 rounded-xl px-2.5 text-sm font-extrabold text-[#6D4AFF] transition hover:bg-[#F2EFFF] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#6D4AFF]/25"
+              onClick={onClearQuickFilters}
             >
-              <Grid2X2 className="size-4" />
+              Clear
             </button>
           </div>
         </div>
@@ -389,7 +400,8 @@ export function ShopPage() {
   const [filters, setFilters] = useState<Filters>(emptyFilters);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortOption>('Featured');
-  const [layout, setLayout] = useState<'regular' | 'compact'>('regular');
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [onSaleOnly, setOnSaleOnly] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
@@ -402,12 +414,23 @@ export function ShopPage() {
         !query ||
         product.name.toLowerCase().includes(query) ||
         product.category.toLowerCase().includes(query);
+      const stockMatch = !inStockOnly || product.inStock;
+      const saleMatch =
+        !onSaleOnly ||
+        (typeof product.originalPrice === 'number' &&
+          product.originalPrice > product.price);
 
-      return quickMatch && searchMatch && productMatchesFilters(product, filters);
+      return (
+        quickMatch &&
+        searchMatch &&
+        productMatchesFilters(product, filters) &&
+        stockMatch &&
+        saleMatch
+      );
     });
 
     return sortProducts(products, sort);
-  }, [activeCategory, filters, search, sort]);
+  }, [activeCategory, filters, inStockOnly, onSaleOnly, search, sort]);
 
   function toggleFilter(group: keyof Filters, value: string) {
     setFilters((current) => {
@@ -425,6 +448,11 @@ export function ShopPage() {
     setFilters(emptyFilters);
     setActiveCategory('All Toys');
     setSearch('');
+  }
+
+  function clearQuickFilters() {
+    setInStockOnly(false);
+    setOnSaleOnly(false);
   }
 
   return (
@@ -446,21 +474,19 @@ export function ShopPage() {
             count={filteredProducts.length}
             search={search}
             sort={sort}
-            layout={layout}
+            inStockOnly={inStockOnly}
+            onSaleOnly={onSaleOnly}
             onSearch={setSearch}
             onSort={setSort}
-            onLayout={setLayout}
+            onInStockOnlyChange={setInStockOnly}
+            onOnSaleOnlyChange={() => setOnSaleOnly((value) => !value)}
+            onClearQuickFilters={clearQuickFilters}
             onOpenFilters={() => setMobileFiltersOpen(true)}
           />
           {filteredProducts.length > 0 ? (
             <motion.div
               layout
-              className={cn(
-                'grid gap-5',
-                layout === 'regular'
-                  ? 'sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
-                  : 'grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4',
-              )}
+              className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
             >
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
