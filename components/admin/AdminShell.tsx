@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, type MouseEvent, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -46,6 +46,25 @@ export function AdminShell({
     router.replace('/login');
   }
 
+  function navigate(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    setOpen(false);
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+
+    event.preventDefault();
+    router.push(href);
+  }
+
+  const currentPath =
+    pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+
   const navigation = (
     <>
       <div className="flex h-18 items-center gap-3 border-b border-[#E7EAF0] px-5">
@@ -60,12 +79,15 @@ export function AdminShell({
       <nav className="grid gap-1 p-3" aria-label="Admin navigation">
         {links.map(({ href, label, icon: Icon }) => {
           const active =
-            href === '/admin' ? pathname === href : pathname.startsWith(href);
+            href === '/admin'
+              ? currentPath === href
+              : currentPath === href || currentPath.startsWith(`${href}/`);
           return (
             <Link
               key={href}
               href={href}
-              onClick={() => setOpen(false)}
+              prefetch={false}
+              onClick={(event) => navigate(event, href)}
               className={cn(
                 'flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition',
                 active
@@ -82,6 +104,8 @@ export function AdminShell({
       <div className="mt-auto grid gap-1 border-t border-[#E7EAF0] p-3">
         <Link
           href="/"
+          prefetch={false}
+          onClick={(event) => navigate(event, '/')}
           className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[#475467] hover:bg-[#F8FAFC]"
         >
           <Store className="size-4.5" />
