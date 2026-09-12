@@ -38,6 +38,7 @@ export default async function Page() {
         </div>
         <Link
           href="/admin/delivery/agents"
+          prefetch={false}
           className="rounded-lg bg-[#6D4AFF] px-4 py-3 text-sm font-semibold text-white"
         >
           Manage Agents
@@ -62,6 +63,7 @@ export default async function Page() {
             <Link
               key={row.id}
               href={`/admin/orders/${row.orders.id}`}
+              prefetch={false}
               className="grid gap-2 border-b p-4 last:border-0 sm:grid-cols-5"
             >
               <strong>{row.orders.order_number}</strong>

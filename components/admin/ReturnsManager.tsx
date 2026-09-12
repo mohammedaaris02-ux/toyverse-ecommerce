@@ -64,6 +64,7 @@ export function ReturnsManager({
     setMessage('');
     const response = await fetch(`/api/admin/returns/${item.id}/status`, {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: next, note: notes[item.id] || null }),
     });
@@ -105,6 +106,7 @@ export function ReturnsManager({
       <div className="mb-4 flex flex-wrap gap-2">
         {statuses.map((status) => (
           <button
+            type="button"
             key={status}
             onClick={() => setFilter(status)}
             className={`min-h-10 rounded-lg border px-3 text-sm font-semibold ${filter === status ? 'bg-[#6D4AFF] text-white' : 'bg-white'}`}
@@ -200,6 +202,7 @@ export function ReturnsManager({
                         className="h-10 rounded-lg border px-2"
                       />
                       <button
+                        type="button"
                         disabled={busy === item.id || !selected[item.id]}
                         onClick={() => void update(item)}
                         className="min-h-10 rounded-lg bg-[#6D4AFF] px-3 font-semibold text-white disabled:opacity-50"

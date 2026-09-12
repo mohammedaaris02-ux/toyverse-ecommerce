@@ -374,6 +374,7 @@ export function ProductForm({ product, categories, images = [] }: Props) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/products"
+            prefetch={false}
             aria-label="Back to products"
             className="grid size-11 place-items-center rounded-lg border border-[#D0D5DD] bg-white hover:bg-[#F8FAFC]"
           >
@@ -387,6 +388,7 @@ export function ProductForm({ product, categories, images = [] }: Props) {
           </div>
         </div>
         <button
+          type="submit"
           disabled={saving}
           className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#6D4AFF] px-5 text-sm font-semibold text-white disabled:opacity-50"
         >

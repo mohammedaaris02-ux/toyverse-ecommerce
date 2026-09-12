@@ -158,6 +158,7 @@ export function CategoriesManager({
                     {item.is_active ? 'Active' : 'Inactive'}
                   </span>
                   <button
+                    type="button"
                     onClick={() =>
                       setForm({
                         id: item.id,
@@ -174,6 +175,7 @@ export function CategoriesManager({
                     <Edit3 className="size-4" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => toggle(item)}
                     className="min-h-10 rounded-lg border border-[#D0D5DD] px-3 text-sm font-semibold hover:bg-[#F8FAFC]"
                   >
@@ -262,6 +264,7 @@ export function CategoriesManager({
             )}
             <div className="flex gap-2">
               <button
+                type="submit"
                 disabled={saving}
                 className="min-h-11 flex-1 rounded-lg bg-[#6D4AFF] px-4 text-sm font-semibold text-white disabled:opacity-50"
               >

@@ -131,6 +131,7 @@ export function AdminShell({
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
+            type="button"
             aria-label="Close navigation"
             className="absolute inset-0 bg-[#101828]/35"
             onClick={() => setOpen(false)}
@@ -138,6 +139,7 @@ export function AdminShell({
           <aside className="relative flex h-full w-[min(84vw,300px)] flex-col bg-white shadow-2xl">
             {navigation}
             <button
+              type="button"
               aria-label="Close navigation"
               onClick={() => setOpen(false)}
               className="absolute right-3 top-3 grid size-10 place-items-center rounded-lg hover:bg-[#F2EFFF]"

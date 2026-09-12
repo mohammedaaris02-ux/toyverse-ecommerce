@@ -115,6 +115,7 @@ export function ProductsManager({
         </div>
         <Link
           href="/admin/products/new"
+          prefetch={false}
           className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#6D4AFF] px-4 text-sm font-semibold text-white hover:bg-[#5B3DF5]"
         >
           <Plus className="size-4" />
@@ -264,18 +265,21 @@ export function ProductsManager({
                       <div className="flex justify-end gap-2">
                         <Link
                           href={`/admin/products/${item.id}/edit`}
+                          prefetch={false}
                           aria-label={`Edit ${item.name}`}
                           className="grid size-10 place-items-center rounded-lg border border-[#D0D5DD] hover:bg-[#F8FAFC]"
                         >
                           <Edit3 className="size-4" />
                         </Link>
                         <button
+                          type="button"
                           onClick={() => toggle(item)}
                           className="min-h-10 rounded-lg border border-[#D0D5DD] px-3 text-xs font-semibold hover:bg-[#F8FAFC]"
                         >
                           {item.is_active ? 'Disable' : 'Enable'}
                         </button>
                         <button
+                          type="button"
                           onClick={() => setDeleting(item)}
                           aria-label={`Delete ${item.name}`}
                           className="grid size-10 place-items-center rounded-lg border border-[#FDA29B] text-[#B42318] hover:bg-[#FEF3F2]"

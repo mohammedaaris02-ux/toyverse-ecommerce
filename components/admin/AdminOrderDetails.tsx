@@ -104,6 +104,7 @@ export function AdminOrderDetails({
       `/api/admin/orders/${order.id}/delivery-status`,
       {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: selectedDeliveryStatus }),
       },
@@ -294,6 +295,7 @@ export function AdminOrderDetails({
               className="mt-3 h-11 w-full rounded-lg border px-3 disabled:bg-[#F2F4F7]"
             />
             <button
+              type="button"
               disabled={
                 busy || !agentId || order.status !== 'packed' || orderIsTerminal
               }

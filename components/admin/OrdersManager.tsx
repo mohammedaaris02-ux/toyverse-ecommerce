@@ -191,6 +191,7 @@ export function OrdersManager({
                       <td className="px-4 py-4">
                         <Link
                           href={`/admin/orders/${o.id}`}
+                          prefetch={false}
                           className="font-semibold text-[#6D4AFF]"
                         >
                           View Order

@@ -220,6 +220,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    const authTimers = new Set<ReturnType<typeof setTimeout>>();
 
     async function initializeAuth() {
       setLoginPending(true);
@@ -260,23 +261,28 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
      */
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (!active) return;
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Supabase holds its auth lock while this callback runs. Defer profile
+      // queries so subsequent browser-client operations cannot deadlock.
+      const timer = setTimeout(() => {
+        authTimers.delete(timer);
+        if (!active) return;
 
-      setLoginPending(true);
-
-      try {
-        await loadCustomer(session?.user ?? null);
-      } finally {
-        if (active) {
-          setReady(true);
-          setLoginPending(false);
-        }
-      }
+        setLoginPending(true);
+        void loadCustomer(session?.user ?? null).finally(() => {
+          if (active) {
+            setReady(true);
+            setLoginPending(false);
+          }
+        });
+      }, 0);
+      authTimers.add(timer);
     });
 
     return () => {
       active = false;
+      authTimers.forEach((timer) => clearTimeout(timer));
+      authTimers.clear();
       subscription.unsubscribe();
     };
   }, [loadCustomer, supabase]);

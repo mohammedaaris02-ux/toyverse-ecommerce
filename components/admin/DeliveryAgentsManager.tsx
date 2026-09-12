@@ -102,6 +102,7 @@ export function DeliveryAgentsManager({
                   {a.is_active ? 'Active' : 'Inactive'}
                 </span>
                 <button
+                  type="button"
                   onClick={() =>
                     setForm({
                       ...a,
@@ -115,6 +116,7 @@ export function DeliveryAgentsManager({
                   Edit
                 </button>
                 <button
+                  type="button"
                   onClick={() => void toggle(a)}
                   className="min-h-10 rounded-lg border px-3 text-sm"
                 >
@@ -168,6 +170,7 @@ export function DeliveryAgentsManager({
             <output className="text-sm text-[#475467]">{message}</output>
           )}
           <button
+            type="submit"
             disabled={saving}
             className="min-h-11 rounded-lg bg-[#6D4AFF] px-4 font-semibold text-white"
           >
