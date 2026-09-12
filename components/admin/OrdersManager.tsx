@@ -1,6 +1,5 @@
 'use client';
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { firstRelation } from '@/lib/order-relations';
 
@@ -189,13 +188,12 @@ export function OrdersManager({
                         {o.order_items?.[0]?.count ?? 0}
                       </td>
                       <td className="px-4 py-4">
-                        <Link
+                        <a
                           href={`/admin/orders/${o.id}`}
-                          prefetch={false}
                           className="font-semibold text-[#6D4AFF]"
                         >
                           View Order
-                        </Link>
+                        </a>
                       </td>
                     </tr>
                   );

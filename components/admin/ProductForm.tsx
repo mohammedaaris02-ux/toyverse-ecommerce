@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native admin navigation avoids the Vinext Link runtime. */
+
 import { useMemo, useState, type SyntheticEvent } from 'react';
 import {
   ArrowLeft,
@@ -9,9 +11,7 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import {
   slugify,
@@ -63,7 +63,6 @@ function productErrorMessage(error: SafeDatabaseError) {
 }
 
 export function ProductForm({ product, categories, images = [] }: Props) {
-  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const [form, setForm] = useState({
     name: product?.name ?? '',
@@ -253,8 +252,7 @@ export function ProductForm({ product, categories, images = [] }: Props) {
         );
         if (error) throw error;
       }
-      router.push('/admin/products');
-      router.refresh();
+      window.location.href = '/admin/products';
     } catch (error) {
       const safeError = databaseError(error);
       console.error('Admin product save failed', { stage, ...safeError });
@@ -372,14 +370,13 @@ export function ProductForm({ product, categories, images = [] }: Props) {
     <form onSubmit={submit}>
       <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Link
+          <a
             href="/admin/products"
-            prefetch={false}
             aria-label="Back to products"
             className="grid size-11 place-items-center rounded-lg border border-[#D0D5DD] bg-white hover:bg-[#F8FAFC]"
           >
             <ArrowLeft className="size-5" />
-          </Link>
+          </a>
           <div>
             <p className="text-sm font-semibold text-[#6D4AFF]">Products</p>
             <h1 className="text-2xl font-bold sm:text-3xl">

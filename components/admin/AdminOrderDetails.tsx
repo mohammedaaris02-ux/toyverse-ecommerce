@@ -1,6 +1,5 @@
 'use client';
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { DeliveryAgent } from './DeliveryAgentsManager';
 import { firstRelation, relationList } from '@/lib/order-relations';
@@ -84,7 +83,6 @@ export function AdminOrderDetails({
   const [selectedOrderStatus, setSelectedOrderStatus] = useState('');
   const [selectedDeliveryStatus, setSelectedDeliveryStatus] = useState('');
   const supabase = useMemo(() => createClient(), []);
-  const router = useRouter();
   async function assign() {
     if (!agentId) return;
     setBusy(true);
@@ -95,7 +93,7 @@ export function AdminOrderDetails({
     });
     setMessage(error?.message ?? 'Delivery assigned successfully.');
     setBusy(false);
-    if (!error) router.refresh();
+    if (!error) window.location.reload();
   }
   async function updateDeliveryStatus() {
     if (!selectedDeliveryStatus) return;
@@ -114,7 +112,7 @@ export function AdminOrderDetails({
     setBusy(false);
     if (response.ok) {
       setSelectedDeliveryStatus('');
-      router.refresh();
+      window.location.reload();
     }
   }
   async function updateOrderStatus() {
@@ -130,7 +128,7 @@ export function AdminOrderDetails({
     setBusy(false);
     if (!error) {
       setSelectedOrderStatus('');
-      router.refresh();
+      window.location.reload();
     }
   }
   const validDeliveryStatuses = assignment

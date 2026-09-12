@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, type MouseEvent, type ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import Link from 'next/link';
+/* eslint-disable next/no-html-link-for-pages -- Vinext production Link runtime throws during admin navigation. */
+
+import { useState, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Boxes,
   LayoutDashboard,
@@ -38,28 +39,11 @@ export function AdminShell({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const { logout: customerLogout } = useCustomerAuth();
 
   async function logout() {
     await customerLogout();
-    router.replace('/login');
-  }
-
-  function navigate(event: MouseEvent<HTMLAnchorElement>, href: string) {
-    setOpen(false);
-    if (
-      event.defaultPrevented ||
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey
-    )
-      return;
-
-    event.preventDefault();
-    router.push(href);
+    window.location.href = '/login';
   }
 
   const currentPath =
@@ -83,11 +67,10 @@ export function AdminShell({
               ? currentPath === href
               : currentPath === href || currentPath.startsWith(`${href}/`);
           return (
-            <Link
+            <a
               key={href}
               href={href}
-              prefetch={false}
-              onClick={(event) => navigate(event, href)}
+              onClick={() => setOpen(false)}
               className={cn(
                 'flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition',
                 active
@@ -97,20 +80,19 @@ export function AdminShell({
             >
               <Icon className="size-4.5" />
               {label}
-            </Link>
+            </a>
           );
         })}
       </nav>
       <div className="mt-auto grid gap-1 border-t border-[#E7EAF0] p-3">
-        <Link
+        <a
           href="/"
-          prefetch={false}
-          onClick={(event) => navigate(event, '/')}
+          onClick={() => setOpen(false)}
           className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[#475467] hover:bg-[#F8FAFC]"
         >
           <Store className="size-4.5" />
           Back to Store
-        </Link>
+        </a>
         <button
           type="button"
           onClick={logout}

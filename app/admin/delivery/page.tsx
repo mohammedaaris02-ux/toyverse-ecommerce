@@ -1,4 +1,4 @@
-import Link from 'next/link';
+/* eslint-disable next/no-html-link-for-pages -- Native admin navigation avoids the Vinext Link runtime. */
 import { createClient } from '@/lib/supabase/server';
 type DeliveryRow = {
   id: string;
@@ -36,13 +36,12 @@ export default async function Page() {
           <p className="text-sm font-semibold text-[#6D4AFF]">Operations</p>
           <h1 className="mt-1 text-3xl font-bold">Delivery</h1>
         </div>
-        <Link
+        <a
           href="/admin/delivery/agents"
-          prefetch={false}
           className="rounded-lg bg-[#6D4AFF] px-4 py-3 text-sm font-semibold text-white"
         >
           Manage Agents
-        </Link>
+        </a>
       </div>
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
@@ -60,10 +59,9 @@ export default async function Page() {
       <section className="mt-6 overflow-hidden rounded-lg border bg-white">
         {rows.length ? (
           rows.map((row) => (
-            <Link
+            <a
               key={row.id}
               href={`/admin/orders/${row.orders.id}`}
-              prefetch={false}
               className="grid gap-2 border-b p-4 last:border-0 sm:grid-cols-5"
             >
               <strong>{row.orders.order_number}</strong>
@@ -71,7 +69,7 @@ export default async function Page() {
               <span>{row.orders.shipping_city}</span>
               <span>{row.delivery_agents?.full_name || 'Unassigned'}</span>
               <span>{row.status.replaceAll('_', ' ')}</span>
-            </Link>
+            </a>
           ))
         ) : (
           <p className="p-10 text-center text-[#667085]">No deliveries yet.</p>

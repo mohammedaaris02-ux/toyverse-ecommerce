@@ -1,8 +1,9 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native admin navigation avoids the Vinext Link runtime. */
+
 import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import {
   Edit3,
   ImageOff,
@@ -113,14 +114,13 @@ export function ProductsManager({
             Manage live pricing, stock, visibility and merchandising.
           </p>
         </div>
-        <Link
+        <a
           href="/admin/products/new"
-          prefetch={false}
           className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#6D4AFF] px-4 text-sm font-semibold text-white hover:bg-[#5B3DF5]"
         >
           <Plus className="size-4" />
           Add product
-        </Link>
+        </a>
       </div>
       <section className="overflow-hidden rounded-lg border border-[#E7EAF0] bg-white shadow-sm">
         <div className="grid gap-3 border-b border-[#E7EAF0] p-4 lg:grid-cols-[minmax(280px,1fr)_auto]">
@@ -263,14 +263,13 @@ export function ProductsManager({
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-end gap-2">
-                        <Link
+                        <a
                           href={`/admin/products/${item.id}/edit`}
-                          prefetch={false}
                           aria-label={`Edit ${item.name}`}
                           className="grid size-10 place-items-center rounded-lg border border-[#D0D5DD] hover:bg-[#F8FAFC]"
                         >
                           <Edit3 className="size-4" />
-                        </Link>
+                        </a>
                         <button
                           type="button"
                           onClick={() => toggle(item)}

@@ -1,5 +1,5 @@
+/* eslint-disable next/no-html-link-for-pages -- Native admin navigation avoids the Vinext Link runtime. */
 import { AlertTriangle, Boxes, PackageCheck, Tags, Truck } from 'lucide-react';
-import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AdminDashboard() {
@@ -90,13 +90,12 @@ export default async function AdminDashboard() {
             Live inventory and category totals from Supabase.
           </p>
         </div>
-        <Link
+        <a
           href="/admin/products/new"
-          prefetch={false}
           className="inline-flex min-h-11 items-center rounded-lg bg-[#6D4AFF] px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#5B3DF5]"
         >
           Add product
-        </Link>
+        </a>
       </div>
       {loadError && (
         <p
@@ -130,36 +129,33 @@ export default async function AdminDashboard() {
       <section className="mt-6 border-y border-[#E7EAF0] bg-white px-5 py-6 sm:px-6">
         <h2 className="text-lg font-bold">Catalog workflow</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <Link
+          <a
             href="/admin/categories"
-            prefetch={false}
             className="rounded-lg border border-[#E7EAF0] p-4 hover:border-[#6D4AFF]/40 hover:bg-[#F9F8FF]"
           >
             <strong className="block">1. Organize categories</strong>
             <span className="mt-1 block text-sm text-[#667085]">
               Keep storefront navigation clean.
             </span>
-          </Link>
-          <Link
+          </a>
+          <a
             href="/admin/products"
-            prefetch={false}
             className="rounded-lg border border-[#E7EAF0] p-4 hover:border-[#6D4AFF]/40 hover:bg-[#F9F8FF]"
           >
             <strong className="block">2. Manage inventory</strong>
             <span className="mt-1 block text-sm text-[#667085]">
               Review stock, pricing and status.
             </span>
-          </Link>
-          <Link
+          </a>
+          <a
             href="/admin/products/new"
-            prefetch={false}
             className="rounded-lg border border-[#E7EAF0] p-4 hover:border-[#6D4AFF]/40 hover:bg-[#F9F8FF]"
           >
             <strong className="block">3. Publish products</strong>
             <span className="mt-1 block text-sm text-[#667085]">
               Add product details and imagery.
             </span>
-          </Link>
+          </a>
         </div>
       </section>
     </div>
