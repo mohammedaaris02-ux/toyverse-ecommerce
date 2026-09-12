@@ -6,13 +6,19 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BadgeCheck,
+  Blocks,
+  Brush,
+  Car,
   Check,
   ChevronRight,
+  GraduationCap,
+  Mountain,
   Quote,
   ShieldCheck,
   Sparkles,
   Star,
   Truck,
+  ToyBrick,
   Zap,
 } from 'lucide-react';
 
@@ -28,9 +34,9 @@ import {
   ToyVisual,
   TrustBar,
 } from '@/components/toyverse/shared';
-import { categories } from '@/data/categories';
-import { bestSellers, newArrivals, type Product } from '@/data/products';
 import { testimonials } from '@/data/testimonials';
+import type { CustomerProduct } from '@/lib/customer-products';
+import type { CustomerCategory } from '@/lib/customer-products-server';
 import { cn } from '@/lib/utils';
 
 function Hero() {
@@ -55,7 +61,7 @@ function Hero() {
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <PrimaryLinkButton href="/shop">Shop Toys</PrimaryLinkButton>
           <a
-            href="/shop"
+            href="/categories"
             className="inline-flex h-12 items-center justify-center rounded-xl border border-[#D9E2F0] bg-white px-6 text-base font-bold text-[#101828] transition hover:bg-[#EDF6FF] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#6D4AFF]/25"
           >
             Explore Categories
@@ -109,10 +115,12 @@ function SectionHeading({
   title,
   subtitle,
   action,
+  actionHref = '/shop',
 }: {
   title: string;
   subtitle: string;
   action?: string;
+  actionHref?: string;
 }) {
   return (
     <div className="mb-9 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -126,7 +134,7 @@ function SectionHeading({
       </div>
       {action ? (
         <a
-          href="/shop"
+          href={actionHref}
           className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#D9E2F0] bg-white px-4 text-sm font-bold text-[#6D4AFF] transition hover:border-[#6D4AFF]/30 hover:bg-[#F2EFFF]"
         >
           {action} <ChevronRight className="size-4" />
@@ -136,7 +144,17 @@ function SectionHeading({
   );
 }
 
-function Categories() {
+const categoryIcons = [GraduationCap, Blocks, Car, ToyBrick, Mountain, Brush];
+const categoryAccents = [
+  'bg-[#F2EFFF]',
+  'bg-[#EDF6FF]',
+  'bg-[#FFF0F6]',
+  'bg-[#FFF8E1]',
+  'bg-[#ECFDF5]',
+  'bg-[#F7F3FF]',
+];
+
+function Categories({ categories }: { categories: CustomerCategory[] }) {
   return (
     <motion.section
       {...fadeUp}
@@ -147,28 +165,33 @@ function Categories() {
         subtitle="Find the perfect toy for every little explorer."
       />
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-        {categories.map(({ title, accent, icon: Icon }) => (
-          <a
-            href="/shop"
-            key={title}
-            className="group flex min-h-56 flex-col justify-between rounded-2xl border border-[#E6EAF2] bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            <div
-              className={cn(
-                'grid aspect-square place-items-center overflow-hidden rounded-2xl',
-                accent,
-              )}
+        {categories.slice(0, 6).map((category, index) => {
+          const Icon = categoryIcons[index % categoryIcons.length];
+          return (
+            <a
+              href={`/shop?category=${category.slug}`}
+              key={category.id}
+              className="group flex min-h-56 flex-col justify-between rounded-2xl border border-[#E6EAF2] bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="grid size-20 place-items-center rounded-3xl bg-white/80 text-[#6D4AFF] shadow-lg transition duration-300 group-hover:scale-110">
-                <Icon className="size-9" />
+              <div
+                className={cn(
+                  'grid aspect-square place-items-center overflow-hidden rounded-2xl',
+                  categoryAccents[index % categoryAccents.length],
+                )}
+              >
+                <div className="grid size-20 place-items-center rounded-3xl bg-white/80 text-[#6D4AFF] shadow-lg transition duration-300 group-hover:scale-110">
+                  <Icon className="size-9" />
+                </div>
               </div>
-            </div>
-            <div className="mt-4 flex items-center justify-between gap-2">
-              <h3 className="text-sm font-extrabold text-[#101828]">{title}</h3>
-              <ArrowRight className="size-4 shrink-0 text-[#247BFE]" />
-            </div>
-          </a>
-        ))}
+              <div className="mt-4 flex items-center justify-between gap-2">
+                <h3 className="text-sm font-extrabold text-[#101828]">
+                  {category.name}
+                </h3>
+                <ArrowRight className="size-4 shrink-0 text-[#247BFE]" />
+              </div>
+            </a>
+          );
+        })}
       </div>
     </motion.section>
   );
@@ -179,18 +202,25 @@ function ProductSection({
   subtitle,
   products,
   action,
+  actionHref,
 }: {
   title: string;
   subtitle: string;
-  products: Product[];
+  products: CustomerProduct[];
   action?: string;
+  actionHref?: string;
 }) {
   return (
     <motion.section
       {...fadeUp}
       className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8"
     >
-      <SectionHeading title={title} subtitle={subtitle} action={action} />
+      <SectionHeading
+        title={title}
+        subtitle={subtitle}
+        action={action}
+        actionHref={actionHref}
+      />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -221,9 +251,9 @@ function PromoBanner() {
           </p>
           <a
             href="/shop"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-xl bg-white px-6 font-extrabold text-[#6D4AFF] transition hover:bg-[#FFF8E1] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/40"
+            className="mt-8 inline-flex min-h-12 cursor-pointer items-center justify-center rounded-xl bg-white px-6 py-3 font-semibold text-[#4B2ECC]! shadow-sm transition duration-200 hover:bg-[#FFF8E1] hover:text-[#351C9E]! hover:shadow-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-white/60"
           >
-            Shop Offers
+            Shop Now
           </a>
         </div>
         <div className="relative z-10 mt-8 lg:mt-0">
@@ -241,14 +271,29 @@ function WhyChooseUs() {
       "Carefully selected toys designed with children's safety in mind.",
       ShieldCheck,
     ],
-    ['Quality You Can Trust', 'Durable, reliable and parent-approved products.', BadgeCheck],
-    ['Fast & Reliable Delivery', "Quick delivery so the fun doesn't have to wait.", Truck],
-    ['Easy Shopping Experience', 'Simple browsing, checkout and customer support.', Zap],
+    [
+      'Quality You Can Trust',
+      'Durable, reliable and parent-approved products.',
+      BadgeCheck,
+    ],
+    [
+      'Fast & Reliable Delivery',
+      "Quick delivery so the fun doesn't have to wait.",
+      Truck,
+    ],
+    [
+      'Easy Shopping Experience',
+      'Simple browsing, checkout and customer support.',
+      Zap,
+    ],
   ] as const;
 
   return (
     <section className="bg-[#F8FAFC] py-20">
-      <motion.div {...fadeUp} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <motion.div
+        {...fadeUp}
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+      >
         <SectionHeading
           title="Why Parents Choose ToyVerse"
           subtitle="Everything we do is designed to make shopping for your little ones simple, safe and joyful."
@@ -299,7 +344,10 @@ function EducationalBanner() {
               'Supports early learning',
               'Encourages problem solving',
             ].map((point) => (
-              <span key={point} className="flex items-center gap-3 font-bold text-[#344054]">
+              <span
+                key={point}
+                className="flex items-center gap-3 font-bold text-[#344054]"
+              >
                 <Check className="size-5 text-[#039855]" /> {point}
               </span>
             ))}
@@ -338,7 +386,9 @@ function Testimonials() {
                 {testimonial.name.charAt(0)}
               </span>
               <span>
-                <strong className="block text-[#101828]">{testimonial.name}</strong>
+                <strong className="block text-[#101828]">
+                  {testimonial.name}
+                </strong>
                 <span className="text-xs font-bold text-[#039855]">
                   Verified Buyer
                 </span>
@@ -391,25 +441,38 @@ function Newsletter() {
   );
 }
 
-export function HomePage() {
+export function HomePage({
+  products,
+  categories,
+}: {
+  products: CustomerProduct[];
+  categories: CustomerCategory[];
+}) {
+  const bestSellers = products
+    .filter((product) => product.isBestSeller)
+    .slice(0, 4);
+  const newArrivals = products.filter((product) => product.isNew).slice(0, 4);
   return (
     <main id="home" className="min-h-screen overflow-x-hidden">
       <AnnouncementBar />
       <Header />
       <Hero />
       <TrustBar />
-      <Categories />
+      <Categories categories={categories} />
       <ProductSection
         title="Our Best Sellers"
         subtitle="Most-loved toys picked by parents and kids."
         products={bestSellers}
         action="View All"
+        actionHref="/shop?filter=best-sellers"
       />
       <PromoBanner />
       <ProductSection
         title="Fresh Finds For Little Ones"
         subtitle="Discover the newest toys added to ToyVerse."
         products={newArrivals}
+        action="View All"
+        actionHref="/shop?filter=new-arrivals"
       />
       <WhyChooseUs />
       <EducationalBanner />
