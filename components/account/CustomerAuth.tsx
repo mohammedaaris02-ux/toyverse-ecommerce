@@ -21,6 +21,7 @@ type CustomerUser = {
   phone: string;
   avatarUrl: string;
   role: 'customer' | 'admin';
+  emailEditable: boolean;
 };
 
 type UpdateProfileInput = {
@@ -43,6 +44,12 @@ type CustomerAuthContextType = {
     message: string;
   }>;
 
+  updateEmail: (email: string) => Promise<{
+    success: boolean;
+    pendingVerification: boolean;
+    message: string;
+  }>;
+
   logout: () => Promise<void>;
 };
 
@@ -50,6 +57,14 @@ const CustomerAuthContext = createContext<CustomerAuthContextType | null>(null);
 
 function getEmail(authUser: SupabaseUser) {
   return authUser.email ?? '';
+}
+
+function canEditEmail(authUser: SupabaseUser) {
+  const providers = Array.isArray(authUser.app_metadata?.providers)
+    ? authUser.app_metadata.providers
+    : [authUser.app_metadata?.provider].filter(Boolean);
+
+  return providers.includes('email');
 }
 
 function getFallbackName(authUser: SupabaseUser) {
@@ -158,6 +173,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
                 ? authUser.user_metadata.avatar_url
                 : '',
             role: 'customer',
+            emailEditable: canEditEmail(authUser),
           });
 
           return;
@@ -170,6 +186,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
           phone: newProfile.phone || '',
           avatarUrl: newProfile.avatar_url || '',
           role: newProfile.role === 'admin' ? 'admin' : 'customer',
+          emailEditable: canEditEmail(authUser),
         });
 
         return;
@@ -182,6 +199,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         phone: profile.phone || '',
         avatarUrl: profile.avatar_url || '',
         role: profile.role === 'admin' ? 'admin' : 'customer',
+        emailEditable: canEditEmail(authUser),
       });
     },
     [supabase],
@@ -369,6 +387,84 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     [supabase, user],
   );
 
+  const updateEmail = useCallback(
+    async (email: string) => {
+      const normalizedEmail = email.trim().toLowerCase();
+
+      if (!user) {
+        return {
+          success: false,
+          pendingVerification: false,
+          message: 'You must be logged in.',
+        };
+      }
+
+      if (!user.emailEditable) {
+        return {
+          success: false,
+          pendingVerification: false,
+          message: 'Your email is managed by your Google account.',
+        };
+      }
+
+      if (normalizedEmail === user.email.trim().toLowerCase()) {
+        return {
+          success: true,
+          pendingVerification: false,
+          message: 'Profile updated successfully.',
+        };
+      }
+
+      const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(
+        /\/$/,
+        '',
+      );
+      const siteUrl =
+        configuredSiteUrl ||
+        (typeof window !== 'undefined'
+          ? window.location.origin
+          : 'http://localhost:3000');
+      const { data, error } = await supabase.auth.updateUser(
+        { email: normalizedEmail },
+        { emailRedirectTo: `${siteUrl}/account/profile` },
+      );
+
+      if (error) {
+        console.error('Auth email update error:', error.message);
+        const duplicateEmail =
+          /already (?:associated|been registered|registered)|already exists|email address is already/i.test(
+            error.message,
+          );
+
+        return {
+          success: false,
+          pendingVerification: false,
+          message: duplicateEmail
+            ? 'This email address is already associated with another account.'
+            : 'Unable to update your email. Please try again.',
+        };
+      }
+
+      const activeEmail = data.user.email?.trim().toLowerCase() ?? '';
+      if (activeEmail === normalizedEmail) {
+        await loadCustomer(data.user);
+        return {
+          success: true,
+          pendingVerification: false,
+          message: 'Profile and email updated successfully.',
+        };
+      }
+
+      return {
+        success: true,
+        pendingVerification: true,
+        message:
+          'Email update requested. Please check your new email address and follow the verification link to complete the change.',
+      };
+    },
+    [loadCustomer, supabase, user],
+  );
+
   /*
    * REAL SUPABASE LOGOUT
    */
@@ -405,6 +501,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     loginPending,
     refreshUser,
     updateProfile,
+    updateEmail,
     logout,
   };
 

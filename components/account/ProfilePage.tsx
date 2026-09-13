@@ -119,7 +119,7 @@ function Field({
 }
 
 function PersonalInformation() {
-  const { user, updateProfile } = useCustomerAuth();
+  const { user, updateEmail, updateProfile } = useCustomerAuth();
 
   const store = useCustomerStore();
 
@@ -131,19 +131,27 @@ function PersonalInformation() {
 
   const [phone, setPhone] = useState(user?.phone ?? '');
 
+  const [email, setEmail] = useState(user?.email ?? '');
+
+  const [emailMessage, setEmailMessage] = useState('');
+
   const [errors, setErrors] = useState<{
     fullName?: string;
     phone?: string;
+    email?: string;
   }>({});
 
   if (!user) return null;
 
   async function submit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!user) return;
+    const currentUser = user;
 
     const next: {
       fullName?: string;
       phone?: string;
+      email?: string;
     } = {};
 
     if (!fullName.trim()) {
@@ -152,6 +160,13 @@ function PersonalInformation() {
 
     if (phone.trim() && !phoneValid(phone)) {
       next.phone = 'Enter a valid Indian mobile number, e.g. +91 98765 43210.';
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      next.email = 'Please enter your email address.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      next.email = 'Please enter a valid email address.';
     }
 
     setErrors(next);
@@ -167,20 +182,38 @@ function PersonalInformation() {
       phone: phone.trim(),
     });
 
-    setSaving(false);
-
-    store.notify(result.message);
-
-    if (result.success) {
-      setEditing(false);
+    if (!result.success) {
+      setSaving(false);
+      store.notify(result.message);
+      return;
     }
+
+    const emailChanged =
+      currentUser.emailEditable &&
+      normalizedEmail !== currentUser.email.trim().toLowerCase();
+    const emailResult = emailChanged
+      ? await updateEmail(normalizedEmail)
+      : null;
+
+    setSaving(false);
+    const message = emailResult?.message ?? result.message;
+    setEmailMessage(emailResult?.pendingVerification ? message : '');
+    store.notify(
+      emailResult && !emailResult.success
+        ? `Profile saved. ${emailResult.message}`
+        : message,
+    );
+
+    if (!emailResult || emailResult.success) setEditing(false);
   }
 
   function cancelEditing() {
     if (!user) return;
     setFullName(user.fullName ?? '');
     setPhone(user.phone ?? '');
+    setEmail(user.email ?? '');
     setErrors({});
+    setEmailMessage('');
     setEditing(false);
   }
 
@@ -209,7 +242,10 @@ function PersonalInformation() {
 
               setPhone(user.phone ?? '');
 
+              setEmail(user.email ?? '');
+
               setErrors({});
+              setEmailMessage('');
               setEditing(true);
             }}
           >
@@ -240,9 +276,14 @@ function PersonalInformation() {
           <Field
             label="Email Address"
             type="email"
-            value={user.email}
-            readOnly
-            onChange={() => {}}
+            value={editing ? email : user.email}
+            required
+            readOnly={!editing || !user.emailEditable}
+            error={errors.email}
+            onChange={(value) => {
+              setEmail(value);
+              setErrors((current) => ({ ...current, email: undefined }));
+            }}
           />
 
           <Field
@@ -269,10 +310,12 @@ function PersonalInformation() {
           />
         </div>
 
-        <p className="mt-4 rounded-xl bg-[#EDF6FF] px-4 py-3 text-sm leading-6 text-[#475467]">
-          Email changes will be handled separately through Supabase
-          Authentication.
-        </p>
+        <output className="mt-4 block rounded-xl bg-[#EDF6FF] px-4 py-3 text-sm leading-6 text-[#475467]">
+          {emailMessage ||
+            (user.emailEditable
+              ? 'Changing your email may require verification.'
+              : 'Your email is managed by your Google account.')}
+        </output>
 
         {editing && (
           <div className="mt-6 flex flex-wrap justify-end gap-3">
