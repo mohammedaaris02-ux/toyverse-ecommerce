@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { LoaderCircle, Sparkles } from 'lucide-react';
 import { useCustomerAuth } from './CustomerAuth';
 
@@ -10,7 +10,6 @@ export function CustomerRouteGuard({ children }: { children: ReactNode }) {
   const { ready, isLoggedIn, loginPending } = useCustomerAuth();
 
   const pathname = usePathname();
-  const router = useRouter();
 
   const isLoginPage = pathname === '/login' || pathname === '/login/';
   const isProtectedCustomerPage =
@@ -29,11 +28,11 @@ export function CustomerRouteGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (destination) {
-      router.replace(destination);
+      window.location.replace(destination);
     }
-  }, [destination, router]);
+  }, [destination]);
 
-  if (!ready || destination) {
+  if ((!ready && isProtectedCustomerPage) || destination) {
     return (
       <main className="grid min-h-dvh place-items-center bg-[#F8FAFC] px-4 text-[#101828]">
         <div className="flex flex-col items-center gap-5">

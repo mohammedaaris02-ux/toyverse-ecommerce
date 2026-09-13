@@ -1,5 +1,6 @@
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
-import Link from 'next/link';
+
+/* eslint-disable next/no-html-link-for-pages -- Native anchors avoid the Vinext production Link runtime failure. */
 import { AnnouncementBar, Footer, Header } from '@/components/toyverse/shared';
 
 export type PolicySection = { title: string; paragraphs: string[] };
@@ -51,18 +52,18 @@ export function PolicyPage({
           </div>
         </article>
         <div className="mt-9 flex flex-wrap justify-center gap-3">
-          <Link
+          <a
             href="/"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#6D4AFF] px-6 py-3 font-bold text-white! transition hover:bg-[#5B3DF5] hover:shadow-lg focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#6D4AFF]/30"
           >
             <ArrowLeft className="size-4" /> Back to ToyVerse
-          </Link>
-          <Link
+          </a>
+          <a
             href="/shop"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[#D9E2F0] bg-white px-6 py-3 font-bold text-[#344054] transition hover:border-[#6D4AFF]/35 hover:text-[#6D4AFF] focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[#6D4AFF]/20"
           >
             <ShoppingBag className="size-4" /> Continue Shopping
-          </Link>
+          </a>
         </div>
       </section>
       <Footer />

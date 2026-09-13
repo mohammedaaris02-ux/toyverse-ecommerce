@@ -1,13 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 export function OrderRefresh() {
-  const router = useRouter();
-
   useEffect(() => {
-    const refresh = () => router.refresh();
+    const refresh = () => window.location.reload();
     const refreshWhenVisible = () => {
       if (document.visibilityState === 'visible') refresh();
     };
@@ -18,7 +15,7 @@ export function OrderRefresh() {
       window.removeEventListener('focus', refresh);
       document.removeEventListener('visibilitychange', refreshWhenVisible);
     };
-  }, [router]);
+  }, []);
 
   return null;
 }

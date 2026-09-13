@@ -39,7 +39,7 @@ function createCatalogClient() {
   );
 }
 
-export const getShopCatalog = cache(async (): Promise<ShopCatalog> => {
+async function loadShopCatalog(): Promise<ShopCatalog> {
   const supabase = createCatalogClient();
   const [productResult, categoryResult, imageResult] = await Promise.all([
     supabase
@@ -124,7 +124,29 @@ export const getShopCatalog = cache(async (): Promise<ShopCatalog> => {
     categories,
     error: null,
   };
-});
+}
+
+const catalogCacheTtlMs = 15_000;
+let catalogCache: { value: ShopCatalog; expiresAt: number } | null = null;
+let catalogRequest: Promise<ShopCatalog> | null = null;
+
+export async function getShopCatalog(): Promise<ShopCatalog> {
+  if (catalogCache && catalogCache.expiresAt > Date.now()) {
+    return catalogCache.value;
+  }
+  if (catalogRequest) return catalogRequest;
+
+  catalogRequest = loadShopCatalog();
+  try {
+    const value = await catalogRequest;
+    if (!value.error) {
+      catalogCache = { value, expiresAt: Date.now() + catalogCacheTtlMs };
+    }
+    return value;
+  } finally {
+    catalogRequest = null;
+  }
+}
 
 export const getCustomerProductBySlug = cache(
   async function getCustomerProductBySlug(

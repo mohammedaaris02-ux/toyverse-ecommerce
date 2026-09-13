@@ -2,7 +2,6 @@
 
 /* eslint-disable next/no-html-link-for-pages, next/no-img-element */
 import { useId, useState, type SubmitEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
   LockKeyhole,
@@ -135,7 +134,6 @@ async function post(
 function CheckoutContent() {
   const { user, ready } = useCustomerAuth();
   const store = useCustomerStore();
-  const router = useRouter();
   const [shipping, setShipping] = useState<Shipping>({
     fullName: user?.fullName || '',
     phone: user?.phone || '',
@@ -195,7 +193,7 @@ function CheckoutContent() {
         throw new Error('Unable to place order. Please try again.');
       store.clearCart(store.cart.map((item) => ({ ...item })));
       store.notify('Order placed successfully.');
-      router.replace(
+      window.location.replace(
         `/order/success?order=${encodeURIComponent(order.order_number)}`,
       );
     } catch (cause) {

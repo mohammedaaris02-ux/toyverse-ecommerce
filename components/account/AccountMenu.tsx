@@ -1,7 +1,8 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native anchors avoid the Vinext production Link runtime failure. */
+
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Heart, LogOut, MapPin, Package, User, X } from 'lucide-react';
 
@@ -26,7 +27,6 @@ export function AccountMenu({
   const { user, ready, logout } = useCustomerAuth();
 
   const store = useCustomerStore();
-  const router = useRouter();
 
   useEffect(() => {
     if (!open) return;
@@ -183,74 +183,75 @@ export function AccountMenu({
                 {
                   text: 'My Profile',
                   icon: User,
-                  run: () => router.push('/account/profile'),
+                  href: '/account/profile',
                 },
 
                 {
                   text: 'My Addresses',
                   icon: MapPin,
-                  run: () => router.push('/account/profile#addresses'),
+                  href: '/account/profile#addresses',
                 },
 
                 {
                   text: 'My Orders',
                   icon: Package,
-                  run: () => router.push('/account/orders'),
+                  href: '/account/orders',
                 },
-
-                {
-                  text: 'Wishlist',
-                  icon: Heart,
-                  run: () => store.setPanel('wishlist'),
-                },
-
-                {
-                  text: 'Logout',
-                  icon: LogOut,
-                  run: async () => {
-                    await logout();
-
-                    store.notify('You have been logged out.');
-
-                    router.replace('/login');
-                    router.refresh();
-                  },
-                },
-              ].map(({ text, icon: Icon, run }) => (
-                <button
+              ].map(({ text, icon: Icon, href }) => (
+                <a
                   key={text}
-                  type="button"
-                  onClick={() => action(run)}
+                  href={href}
+                  onClick={() => action(() => {})}
                   className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold transition hover:bg-[#F2EFFF] hover:text-[#6D4AFF] ${focus}`}
                 >
                   <Icon className="size-4" />
                   {text}
-                </button>
+                </a>
               ))}
-            </div>
-          ) : (
-            <div className="mt-4 grid gap-2">
               <button
                 type="button"
-                onClick={() => action(() => router.push('/login'))}
-                className={`min-h-11 rounded-xl bg-gradient-to-r from-[#6D4AFF] to-[#247BFE] font-semibold text-white shadow-sm transition hover:shadow-md ${focus}`}
+                onClick={() => action(() => store.setPanel('wishlist'))}
+                className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold transition hover:bg-[#F2EFFF] hover:text-[#6D4AFF] ${focus}`}
               >
-                Sign In
+                <Heart className="size-4" />
+                Wishlist
               </button>
-
               <button
                 type="button"
                 onClick={() =>
-                  action(() =>
-                    store.notify(
-                      'Account registration will be available in a future update.',
-                    ),
-                  )
+                  action(async () => {
+                    await logout();
+                    store.notify('You have been logged out.');
+                    window.location.replace('/login');
+                  })
                 }
+                className={`flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold transition hover:bg-[#F2EFFF] hover:text-[#6D4AFF] ${focus}`}
+              >
+                <LogOut className="size-4" />
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4 grid gap-2">
+              <a
+                href="/login"
+                onClick={() => action(() => {})}
+                className={`min-h-11 rounded-xl bg-gradient-to-r from-[#6D4AFF] to-[#247BFE] font-semibold text-white shadow-sm transition hover:shadow-md ${focus}`}
+              >
+                <span className="flex min-h-11 items-center justify-center">
+                  Sign In
+                </span>
+              </a>
+
+              <a
+                href="/register"
+                onClick={() => action(() => {})}
                 className={`min-h-11 rounded-xl border border-[#E6EAF2] font-semibold transition hover:bg-[#F2EFFF] hover:text-[#6D4AFF] ${focus}`}
               >
-                Create Account
-              </button>
+                <span className="flex min-h-11 items-center justify-center">
+                  Create Account
+                </span>
+              </a>
             </div>
           )}
         </motion.div>

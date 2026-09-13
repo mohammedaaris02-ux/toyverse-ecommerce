@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native anchors avoid the Vinext production Link runtime failure. */
+
 import {
   useCallback,
   useEffect,
@@ -8,9 +10,6 @@ import {
   useState,
   type SubmitEvent,
 } from 'react';
-
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 import {
   Heart,
@@ -856,15 +855,12 @@ export function ProfilePage() {
 
   const store = useCustomerStore();
 
-  const router = useRouter();
-
   async function handleLogout() {
     await logout();
 
     store.notify('You have been logged out.');
 
-    router.replace('/login');
-    router.refresh();
+    window.location.replace('/login');
   }
 
   return (
@@ -894,13 +890,9 @@ export function ProfilePage() {
 
             <h2 className="text-xl font-bold">Sign in to view your profile</h2>
 
-            <button
-              type="button"
-              onClick={() => router.push('/login')}
-              className={`${primary} mt-5`}
-            >
+            <a href="/login" className={`${primary} mt-5`}>
               Sign In
-            </button>
+            </a>
           </section>
         ) : (
           <div className="grid items-start gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
@@ -908,28 +900,24 @@ export function ProfilePage() {
               aria-label="Account navigation"
               className="flex flex-wrap gap-2 lg:sticky lg:top-28 lg:flex-col"
             >
-              <Link
+              <a
                 href="/account/profile"
                 aria-current="page"
                 className={`${button} justify-start bg-[#F2EFFF]! text-[#6D4AFF]!`}
               >
                 <User className="size-4" />
                 My Profile
-              </Link>
+              </a>
 
               <a href="#addresses" className={`${button} justify-start`}>
                 <MapPin className="size-4" />
                 My Addresses
               </a>
 
-              <button
-                type="button"
-                onClick={() => router.push('/account/orders')}
-                className={`${button} justify-start`}
-              >
+              <a href="/account/orders" className={`${button} justify-start`}>
                 <Package className="size-4" />
                 My Orders
-              </button>
+              </a>
 
               <button
                 type="button"

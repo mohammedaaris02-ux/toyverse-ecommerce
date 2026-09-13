@@ -2,7 +2,6 @@
 
 import { useState, type SubmitEvent } from 'react';
 import { Ban, Download, RotateCcw, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 type ReturnRequest = {
@@ -41,7 +40,6 @@ export function OrderActions({
   returnEligible: boolean;
   existingReturn: ReturnRequest | null;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
@@ -66,6 +64,7 @@ export function OrderActions({
     try {
       const response = await fetch(`/api/orders/${orderId}/cancel`, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           reason: cancelReason || null,
@@ -85,7 +84,7 @@ export function OrderActions({
       }
       setCancelOpen(false);
       setMessage('Order cancelled successfully.');
-      router.refresh();
+      window.location.reload();
     } catch {
       setMessage('Unable to cancel this order. Please try again.');
     } finally {
@@ -112,7 +111,7 @@ export function OrderActions({
       );
     else {
       setOpen(false);
-      router.refresh();
+      window.location.reload();
     }
     setBusy(false);
   }
@@ -121,7 +120,9 @@ export function OrderActions({
     setDownloading(true);
     setMessage('');
     try {
-      const response = await fetch(`/api/orders/${orderId}/invoice`);
+      const response = await fetch(`/api/orders/${orderId}/invoice`, {
+        credentials: 'same-origin',
+      });
       if (!response.ok) throw new Error();
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -267,6 +268,7 @@ export function OrderActions({
               className="mt-2 w-full rounded-lg border p-3"
             />
             <button
+              type="submit"
               disabled={busy || !reason}
               className="mt-5 min-h-12 w-full rounded-xl bg-[#6D4AFF] font-bold text-white disabled:opacity-60"
             >
@@ -351,6 +353,7 @@ export function OrderActions({
                 Keep Order
               </button>
               <button
+                type="submit"
                 disabled={busy}
                 className="min-h-12 rounded-xl bg-[#D92D20] font-bold text-white hover:bg-[#B42318] disabled:opacity-60"
               >

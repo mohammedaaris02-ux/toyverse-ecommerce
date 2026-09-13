@@ -9,8 +9,6 @@ import {
   type SubmitEvent,
 } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import {
   AnimatePresence,
   motion,
@@ -97,8 +95,6 @@ function AuthVisualPanel() {
 }
 
 function LoginForm({ initialError }: { initialError?: string }) {
-  const router = useRouter();
-
   const ready = useSyncExternalStore(
     subscribeToReady,
     () => true,
@@ -178,8 +174,7 @@ function LoginForm({ initialError }: { initialError?: string }) {
        */
 
       window.setTimeout(() => {
-        router.replace('/');
-        router.refresh();
+        window.location.replace('/');
       }, 600);
     } catch (error) {
       console.error('Login error:', error);
@@ -488,14 +483,13 @@ function LoginForm({ initialError }: { initialError?: string }) {
 
       <p className="mt-6 flex flex-wrap items-center justify-center gap-x-2 text-sm text-[#667085]">
         New to ToyVerse?
-        <button
-          type="button"
-          disabled={pending !== null}
-          onClick={() => router.push('/register')}
-          className={`min-h-11 rounded-lg font-bold text-[#6D4AFF] hover:text-[#247BFE] ${focus}`}
+        <a
+          href="/register"
+          aria-disabled={pending !== null}
+          className={`inline-flex min-h-11 items-center rounded-lg font-bold text-[#6D4AFF] hover:text-[#247BFE] ${pending !== null ? 'pointer-events-none opacity-60' : ''} ${focus}`}
         >
           Create an account
-        </button>
+        </a>
       </p>
 
       {/* NOTICE */}

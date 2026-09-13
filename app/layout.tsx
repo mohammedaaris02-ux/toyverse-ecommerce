@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: 'ToyVerse | Play. Learn. Grow.',
   description:
     'Premium, safe and creative toys for little explorers. Discover best sellers, new arrivals and educational toys at ToyVerse.',
+  icons: { icon: '/favicon.svg' },
 };
 
 export default async function RootLayout({

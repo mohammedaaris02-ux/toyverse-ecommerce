@@ -1,8 +1,8 @@
 'use client';
 
+/* eslint-disable next/no-html-link-for-pages -- Native anchors avoid the Vinext production Link runtime failure. */
+
 import { useRef, useState, type ReactNode, type SubmitEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
   ArrowRight,
   CheckCircle2,
@@ -24,7 +24,6 @@ const input =
 type FieldName = 'fullName' | 'email' | 'password' | 'confirmPassword';
 
 export function RegisterPortal() {
-  const router = useRouter();
   const { refreshUser } = useCustomerAuth();
   const submitting = useRef(false);
   const [pending, setPending] = useState(false);
@@ -103,8 +102,7 @@ export function RegisterPortal() {
       }
 
       await refreshUser();
-      router.replace('/');
-      router.refresh();
+      window.location.replace('/');
     } catch (error) {
       console.error('Signup failed:', error);
       setNotice('Unable to create your account right now. Please try again.');
@@ -117,7 +115,7 @@ export function RegisterPortal() {
   return (
     <main className="min-h-screen bg-[#F8FAFC] px-4 py-8 text-[#101828] sm:px-6 sm:py-12">
       <div className="mx-auto max-w-lg">
-        <Link
+        <a
           href="/"
           aria-label="ToyVerse home"
           className="mb-7 flex w-fit items-center gap-2"
@@ -126,7 +124,7 @@ export function RegisterPortal() {
             <Sparkles className="size-5" />
           </span>
           <strong className="text-xl font-extrabold">ToyVerse</strong>
-        </Link>
+        </a>
 
         <section className="rounded-2xl border border-[#E6EAF2] bg-white p-5 shadow-[0_12px_45px_rgb(16_24_40/6%)] sm:p-9">
           {confirmationRequired ? (
@@ -137,13 +135,12 @@ export function RegisterPortal() {
                 Account created successfully. Please check your email to verify
                 your account before signing in.
               </p>
-              <button
-                type="button"
-                onClick={() => router.push('/login')}
+              <a
+                href="/login"
                 className={`mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#6D4AFF] px-6 font-bold text-white ${focus}`}
               >
                 Go to Login <ArrowRight className="size-4" />
-              </button>
+              </a>
             </div>
           ) : (
             <>
@@ -220,12 +217,12 @@ export function RegisterPortal() {
               </form>
               <p className="mt-6 text-center text-sm text-[#667085]">
                 Already have an account?{' '}
-                <Link
+                <a
                   href="/login"
                   className="font-bold text-[#6D4AFF] hover:text-[#247BFE]"
                 >
                   Sign in
-                </Link>
+                </a>
               </p>
             </>
           )}
